@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "log"
+  "strings"
   "errors"
   "github.com/Jeffail/gabs"
 )
@@ -21,35 +22,57 @@ func new_person(name_in string) *Person {
   jsonObj := gabs.New()
   jsonObj.Set(name_in, "person", "name")
   // jsonObj.Set("c", "person", "traits")
-  jsonObj.ArrayAppend("", "person", "tags")
+  // jsonObj.ArrayAppend("", "person", "tags")
   jsonObj.Array("person", "tags")
   p.Json = jsonObj
   return p
 }
 
 // See about comparing input to what already exists
-func (p Person) add_trait(trait_name, trait_text string) {
+func (p Person) add_trait(trait_path, trait_name, trait_text string) {
   current_json := p.Json
 
-  current_json.Set(trait_text, "person", "traits", trait_name)
-  // current_json.SetP("si", "person.traits.e")
-  // current_json.Set(trait_name, "person", "traits")
-  // current_json.Set(trait_text, "person", "traits")
+  // Get the full dotted path to use for all operations
+  path := create_path(trait_path, trait_name)
 
-  fmt.Println("=======================")
-  fmt.Println(current_json.String())
-  fmt.Println("=======================")
-}
+  // 2 situations, the trait already exists or it doesnt
+  // If it exists array it (there is a check for the array also)
+  // If it doesnt exist add it
 
-// See about comparing input to what already exists
-func (p Person) add_tag(tag_name string) {
-  current_json := p.Json
-  current_json.ArrayAppend(tag_name, "person", "tags")
+  // There are 2 additional situations if the trait exists
+  // The array already exists (add to it)
+  // The array doesn't already exist (make it and add to it)
+
+  // It it exists, else it does not
+  if current_json.ExistsP(path) {
+
+    // Get an error if there is no array
+    _, err := current_json.Path(path).Children()
+
+    // If there is an error we need to make the array
+    if err != nil {
+      // Get the original value (that isnt an array)
+      current_val := current_json.Path(path).Data()
+      // Create an array
+      current_json.ArrayP(path)
+      // Add the original value to the array
+      current_json.ArrayAppendP(current_val, path)
+    }
+
+    // Add the value we had originally wanted to add
+    current_json.ArrayAppendP(trait_text, path)
+  } else {
+    current_json.SetP(trait_text, path)
+  }
+
+
+
+
 }
 
 // If the name will be unique it will change
 func (p Person) change_name(name string) error {
-  if acceptable_name(name) {
+  if acceptable_person_name(name) {
     p.Name = name
     return nil
   } else {
@@ -58,7 +81,27 @@ func (p Person) change_name(name string) error {
 }
 
 // This will have some content at some point to ensure uniquity among names
-func acceptable_name(name string) bool {
+func acceptable_person_name(name string) bool {
+  if true != false {
+    return true
+  } else {
+    return false
+  }
+}
+
+// See about comparing input to what already exists
+func (p Person) add_tag(tag_name string) error {
+  current_json := p.Json
+  if acceptable_tag_name(tag_name) {
+    current_json.ArrayAppend(tag_name, "person", "tags")
+  } else {
+    return errors.New("This tag has been previously assinged, try another.")
+  }
+
+}
+
+// This will have some content at some point to ensure uniquity among tags
+func acceptable_tag_name(name string) bool {
   if true != false {
     return true
   } else {
@@ -96,18 +139,23 @@ func (p Person) t_delete_trait(trait_name string) {
 
 func main() {
 
+  traits_path := "person.traits"
+
+
   p1 := new_person("ben")
   p1.add_tag("friend")
   p1.add_tag("geog 1000")
 
   p2 := new_person("steve")
-  p2.add_trait("relative", "bob")
-  p2.add_trait("relative2", "dod")
+  p2.add_trait(traits_path, "relative.brother", "uno")
+  // p2.add_trait(traits_path, "relative.sister", "dos")
+  p2.add_trait(traits_path, "relative.brother", "tres")
+  p2.add_trait(traits_path, "relative.brother", "quad")
+  //p2.add_trait(traits_path, "relative", "tre")
 
+  // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
 
-  fmt.Println(p2.Json.ExistsP("person.traits.relative"))
-
-  p2.t_delete_trait("bob")
+  // p2.t_delete_trait("bob")
 
   // fmt.Println(p1.Name, "->", p2.Name)
   // fmt.Println(p1.Json.String())
@@ -119,6 +167,20 @@ func main() {
 
 
 }
+
+// Support methods
+
+
+func create_path(path, addition string) string {
+  if !strings.HasSuffix(path, ".") {
+    path = path + "."
+  }
+  if strings.HasPrefix(addition, ".") {
+    addition = addition[1:]
+  }
+  return (path + addition)
+}
+
 
 func check_err(err error) {
   if err != nil {
