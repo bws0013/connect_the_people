@@ -116,7 +116,16 @@ func (p Person) acceptable_tag_name(name string) bool {
 }
 
 func get_all_people_with_tag(tag_name string) {
+  names_with_tag := make([]string, 0)
 
+  for _, p := range people_map {
+    local_tags := p.get_person_tags()
+    if local_tags[tag_name] == true {
+      names_with_tag = append(names_with_tag, p.get_name())
+    }
+  }
+
+  fmt.Println(names_with_tag)
 }
 
 func (p Person) get_person_tags() map[string]bool {
@@ -173,7 +182,7 @@ func main() {
 
   p1.add_tag("dog person")
   p1.add_tag("cat person")
-  p1.add_tag("cat person")
+  p2.add_tag("cat person")
   //p2.add_trait(traits_path, "relative", "tre")
 
   // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
@@ -181,13 +190,16 @@ func main() {
   // p2.t_delete_trait("bob")
 
   // fmt.Println(p1.Name, "->", p2.Name)
-  fmt.Println(p1.Json.String())
-  fmt.Println(p2.Json.String())
+  // fmt.Println(p1.Json.String())
+  // fmt.Println(p2.Json.String())
   //
   //
   //
   // p2.get_person_trails()
   p1.add_to_people_map()
+  p2.add_to_people_map()
+
+  get_all_people_with_tag("cat person")
 
 }
 
