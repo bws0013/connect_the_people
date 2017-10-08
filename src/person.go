@@ -64,10 +64,6 @@ func (p Person) add_trait(trait_path, trait_name, trait_text string) {
   } else {
     current_json.SetP(trait_text, path)
   }
-
-
-
-
 }
 
 // If the name will be unique it will change
@@ -92,8 +88,9 @@ func acceptable_person_name(name string) bool {
 // See about comparing input to what already exists
 func (p Person) add_tag(tag_name string) error {
   current_json := p.Json
-  if acceptable_tag_name(tag_name) {
+  if p.acceptable_tag_name(tag_name) {
     current_json.ArrayAppend(tag_name, "person", "tags")
+    return nil
   } else {
     return errors.New("This tag has been previously assinged, try another.")
   }
@@ -101,8 +98,13 @@ func (p Person) add_tag(tag_name string) error {
 }
 
 // This will have some content at some point to ensure uniquity among tags
-func acceptable_tag_name(name string) bool {
-  if true != false {
+func (p Person) acceptable_tag_name(name string) bool {
+
+  tag_set := p.get_person_tags()
+
+  // If the tag is currently associated with the person do not add it again
+  // If the statement is true then the tag is associated with the person
+  if tag_set[name] == false {
     return true
   } else {
     return false
@@ -114,8 +116,10 @@ func get_all_people_with_tag(tag_name string) {
 }
 
 func (p Person) get_person_tags() map[string]bool {
+  // _, err := current_json.Path(path).Children()
+  current_json := p.Json
   tags := make(map[string]bool)
-  children, err := p.Json.S("person", "tags").Children()
+  children, err := current_json.Path("person.tags").Children()
   check_err(err)
   for _, child := range children {
   	tags[child.Data().(string)] = true
@@ -151,6 +155,11 @@ func main() {
   // p2.add_trait(traits_path, "relative.sister", "dos")
   p2.add_trait(traits_path, "relative.brother", "tres")
   p2.add_trait(traits_path, "relative.brother", "quad")
+  p2.add_trait(traits_path, "location.current", "md")
+
+  p1.add_tag("dog person")
+  p1.add_tag("cat person")
+  p1.add_tag("cat person")
   //p2.add_trait(traits_path, "relative", "tre")
 
   // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
@@ -158,19 +167,28 @@ func main() {
   // p2.t_delete_trait("bob")
 
   // fmt.Println(p1.Name, "->", p2.Name)
-  // fmt.Println(p1.Json.String())
+  fmt.Println(p1.Json.String())
   fmt.Println(p2.Json.String())
   //
   //
   //
   // p2.get_person_trails()
 
-
 }
 
 // Support methods
 
+// Import people json objects from a file
+func import_people_from_file() {
 
+}
+
+// Export people json objects to a file
+func export_people_to_file() {
+
+}
+
+// Create a path to a particular location within the json
 func create_path(path, addition string) string {
   if !strings.HasSuffix(path, ".") {
     path = path + "."
@@ -181,7 +199,7 @@ func create_path(path, addition string) string {
   return (path + addition)
 }
 
-
+// Break if there is an error passed in
 func check_err(err error) {
   if err != nil {
     log.Fatal(err)
