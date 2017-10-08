@@ -16,6 +16,10 @@ type Person struct {
   Json *gabs.Container
 }
 
+var (
+  people_map = make(map[string]Person)
+)
+
 func new_person(name_in string) *Person {
   p := new(Person)
   p.Name = name_in
@@ -135,16 +139,26 @@ func (p Person) get_person_trails() {
   }
 }
 
+func (p Person) get_name() string {
+  return p.Json.Path("person.name").Data().(string)
+}
+
+// This may be un-needed and we may just store directly to map
+// More investigation is required
+func (p Person) add_to_people_map() {
+  if _, exists := people_map[p.get_name()]; !exists {
+    people_map[p.get_name()] = p
+  }
+}
+
 func (p Person) t_delete_trait(trait_name string) {
   err := p.Json.DeleteP("person.traits.relative")
   check_err(err)
 }
 
-
 func main() {
 
   traits_path := "person.traits"
-
 
   p1 := new_person("ben")
   p1.add_tag("friend")
@@ -173,6 +187,7 @@ func main() {
   //
   //
   // p2.get_person_trails()
+  p1.add_to_people_map()
 
 }
 
