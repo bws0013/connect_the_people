@@ -1,18 +1,20 @@
 package main
 
 import (
+  "os"
   "fmt"
   "log"
-  "strings"
   "errors"
+  "strings"
+  "io/ioutil"
   "github.com/Jeffail/gabs"
 )
 
-// Name
+// Name OR Maybe some kind of id and just have name be its own thang
 // Traits
 // Tags/Groups
 type Person struct {
-  Name string
+  Name string // We may want this to be some kind of id
   Json *gabs.Container
 }
 
@@ -23,13 +25,29 @@ var (
 func new_person(name_in string) *Person {
   p := new(Person)
   p.Name = name_in
-  jsonObj := gabs.New()
-  jsonObj.Set(name_in, "person", "name")
-  // jsonObj.Set("c", "person", "traits")
-  // jsonObj.ArrayAppend("", "person", "tags")
-  jsonObj.Array("person", "tags")
-  p.Json = jsonObj
+  new_json := gabs.New()
+  new_json.Set(name_in, "person", "name")
+  // new_json.Set("c", "person", "traits")
+  // new_json.ArrayAppend("", "person", "tags")
+  new_json.Array("person", "tags")
+  p.Json = new_json
   return p
+}
+
+func new_person_from_file(person_data []byte) {
+
+  p := new(Person)
+
+  new_json, err := gabs.ParseJSON(person_data)
+  check_err(err)
+
+  p.Name = new_json.Path("person.name").String()
+  p.Json = new_json
+
+
+
+  p.add_to_people_map()
+
 }
 
 // See about comparing input to what already exists
@@ -167,52 +185,77 @@ func (p Person) t_delete_trait(trait_name string) {
 
 func main() {
 
-  traits_path := "person.traits"
-
-  p1 := new_person("ben")
-  p1.add_tag("friend")
-  p1.add_tag("geog 1000")
-
-  p2 := new_person("steve")
-  p2.add_trait(traits_path, "relative.brother", "uno")
-  // p2.add_trait(traits_path, "relative.sister", "dos")
-  p2.add_trait(traits_path, "relative.brother", "tres")
-  p2.add_trait(traits_path, "relative.brother", "quad")
-  p2.add_trait(traits_path, "location.current", "md")
-
-  p1.add_tag("dog person")
-  p1.add_tag("cat person")
-  p2.add_tag("cat person")
-  //p2.add_trait(traits_path, "relative", "tre")
-
-  // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
-
-  // p2.t_delete_trait("bob")
-
-  // fmt.Println(p1.Name, "->", p2.Name)
-  // fmt.Println(p1.Json.String())
-  // fmt.Println(p2.Json.String())
+  // traits_path := "person.traits"
   //
+  // p1 := new_person("ben")
+  // p1.add_tag("friend")
+  // p1.add_tag("geog 1000")
   //
+  // p2 := new_person("steve")
+  // p2.add_trait(traits_path, "relative.brother", "uno")
+  // // p2.add_trait(traits_path, "relative.sister", "dos")
+  // p2.add_trait(traits_path, "relative.brother", "tres")
+  // p2.add_trait(traits_path, "relative.brother", "quad")
+  // p2.add_trait(traits_path, "location.current", "md")
   //
-  // p2.get_person_trails()
-  p1.add_to_people_map()
-  p2.add_to_people_map()
+  // p1.add_tag("dog person")
+  // p1.add_tag("cat person")
+  // p2.add_tag("cat person")
+  // //p2.add_trait(traits_path, "relative", "tre")
+  //
+  // // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
+  //
+  // // p2.t_delete_trait("bob")
+  //
+  // // fmt.Println(p1.Name, "->", p2.Name)
+  // // fmt.Println(p1.Json.String())
+  // // fmt.Println(p2.Json.String())
+  // //
+  // //
+  // //
+  // // p2.get_person_trails()
+  // p1.add_to_people_map()
+  // p2.add_to_people_map()
 
   get_all_people_with_tag("cat person")
+  // get_all_people_with_tag("dog person")
+  // get_all_people_with_tag("rhino person")
 
+  // export_people_to_file()
+  import_people_from_file()
+  get_all_people_with_tag("cat person")
 }
 
 // Support methods
 
 // Import people json objects from a file
 func import_people_from_file() {
+  storage_path := "./../storage/People_Storage/"
+  file_type := ".json"
 
+  files, err := ioutil.ReadDir(storage_path)
+  check_err(err)
+  for _, f := range files {
+    if strings.HasSuffix(f.Name(), file_type) {
+      person_data, err := ioutil.ReadFile(storage_path + f.Name())
+      check_err(err)
+      new_person_from_file(person_data)
+    }
+  }
 }
 
 // Export people json objects to a file
 func export_people_to_file() {
+  storage_path := "./../storage/People_Storage/"
+  file_type := ".json"
 
+  for _, p := range people_map {
+    jsonOutput := p.Json.String()
+    file, err := os.Create(storage_path + p.get_name() + file_type)
+    check_err(err)
+    defer file.Close()
+    fmt.Fprintf(file, jsonOutput)
+  }
 }
 
 // Create a path to a particular location within the json
