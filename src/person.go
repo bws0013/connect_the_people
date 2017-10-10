@@ -44,8 +44,6 @@ func new_person_from_file(person_data []byte) {
   p.Name = new_json.Path("person.name").String()
   p.Json = new_json
 
-
-
   p.add_to_people_map()
 
 }
@@ -183,6 +181,26 @@ func (p Person) t_delete_trait(trait_name string) {
   check_err(err)
 }
 
+func (p Person) delete_trait(trait_name string) {
+  path := create_path("person.traits", trait_name)
+  err := p.Json.DeleteP(path)
+  check_err(err)
+}
+
+func (p Person) delete_tag(tag_name string) {
+  current_json := p.Json
+  tag_path := "person.tags"
+
+  children, _ := current_json.Path(tag_path).Children()
+  current_json.ArrayP(tag_path)
+  for _, child := range children {
+    tag_string := child.Data().(string)
+    if tag_string != tag_name {
+      current_json.ArrayAppendP(tag_string, tag_path)
+    }
+  }
+}
+
 func main() {
 
   // traits_path := "person.traits"
@@ -223,6 +241,15 @@ func main() {
 
   // export_people_to_file()
   import_people_from_file()
+
+  for _, p := range people_map {
+    fmt.Print(p.get_name(), " ")
+    fmt.Println(p.get_person_tags())
+    p.delete_tag("cat person")
+    fmt.Print(p.get_name(), " ")
+    fmt.Println(p.get_person_tags())
+    fmt.Println("==========================")
+  }
   get_all_people_with_tag("cat person")
 }
 
