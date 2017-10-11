@@ -34,7 +34,7 @@ func new_person(name_in string) *Person {
   return p
 }
 
-func new_person_from_file(person_data []byte) {
+func new_person_from_data(person_data []byte) *Person {
 
   p := new(Person)
 
@@ -44,8 +44,7 @@ func new_person_from_file(person_data []byte) {
   p.Name = new_json.Path("person.name").String()
   p.Json = new_json
 
-  p.add_to_people_map()
-
+  return p
 }
 
 // See about comparing input to what already exists
@@ -131,17 +130,17 @@ func (p Person) acceptable_tag_name(name string) bool {
   }
 }
 
-func get_all_people_with_tag(tag_name string) {
+func get_all_people_with_tag(tag_name string, local_people_map map[string]Person) []string {
   names_with_tag := make([]string, 0)
 
-  for _, p := range people_map {
+  for _, p := range local_people_map {
     local_tags := p.get_person_tags()
     if local_tags[tag_name] == true {
       names_with_tag = append(names_with_tag, p.get_name())
     }
   }
 
-  fmt.Println(names_with_tag)
+  return names_with_tag
 }
 
 func (p Person) get_person_tags() map[string]bool {
@@ -235,7 +234,7 @@ func main() {
   // p1.add_to_people_map()
   // p2.add_to_people_map()
 
-  get_all_people_with_tag("cat person")
+  fmt.Println(get_all_people_with_tag("cat person", people_map))
   // get_all_people_with_tag("dog person")
   // get_all_people_with_tag("rhino person")
 
@@ -250,7 +249,7 @@ func main() {
     fmt.Println(p.get_person_tags())
     fmt.Println("==========================")
   }
-  get_all_people_with_tag("cat person")
+  fmt.Println(get_all_people_with_tag("cat person", people_map))
 }
 
 // Support methods
@@ -266,7 +265,8 @@ func import_people_from_file() {
     if strings.HasSuffix(f.Name(), file_type) {
       person_data, err := ioutil.ReadFile(storage_path + f.Name())
       check_err(err)
-      new_person_from_file(person_data)
+      p := new_person_from_data(person_data)
+      people_map[p.get_name()] = *p
     }
   }
 }
