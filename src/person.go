@@ -18,10 +18,12 @@ type Person struct {
   Json *gabs.Container
 }
 
+// The global people_map is just used for testing purposes at the moment
 var (
   people_map = make(map[string]Person)
 )
 
+// Create a new person given a name, the name will probably be some kind of id later
 func new_person(name_in string) *Person {
   p := new(Person)
   p.Name = name_in
@@ -130,6 +132,7 @@ func (p Person) acceptable_tag_name(name string) bool {
   }
 }
 
+// Given a tag return the name of all of those people on the param map who have it
 func get_all_people_with_tag(tag_name string, local_people_map map[string]Person) []string {
   names_with_tag := make([]string, 0)
 
@@ -143,6 +146,7 @@ func get_all_people_with_tag(tag_name string, local_people_map map[string]Person
   return names_with_tag
 }
 
+// Returns a map (set) of all of the tags of a particular person
 func (p Person) get_person_tags() map[string]bool {
   // _, err := current_json.Path(path).Children()
   current_json := p.Json
@@ -155,7 +159,9 @@ func (p Person) get_person_tags() map[string]bool {
   return tags
 }
 
-func (p Person) get_person_trails() {
+// TODO the get_person_traits method
+// This should get the traits of a person, it currently doesnt
+func (p Person) get_person_traits() {
   children, err := p.Json.S("tags").ChildrenMap()
   check_err(err)
   for key, child := range children {
@@ -163,6 +169,7 @@ func (p Person) get_person_trails() {
   }
 }
 
+// Get the name of a person
 func (p Person) get_name() string {
   return p.Json.Path("person.name").Data().(string)
 }
@@ -175,6 +182,17 @@ func (p Person) add_to_people_map() {
   }
 }
 
+//
+// =========================== top
+//
+
+// Figure out deleting traits effectively
+/*
+We may want to try adding to a predefined path
+ie default path = person.traits, then we add to that, such as .relative.brother
+This way when we webify we can just keep adding to the path as the page changes
+*/
+
 func (p Person) t_delete_trait(trait_name string) {
   err := p.Json.DeleteP("person.traits.relative")
   check_err(err)
@@ -185,7 +203,11 @@ func (p Person) delete_trait(trait_name string) {
   err := p.Json.DeleteP(path)
   check_err(err)
 }
+//
+// =========================== bottom
+//
 
+// Delete a tag from a user
 func (p Person) delete_tag(tag_name string) {
   current_json := p.Json
   tag_path := "person.tags"

@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
+// Most of the simple tests are just going to need a person or two, this generates those people
 func setup_simple_test() map[string]Person {
-
   sample_ben := []byte(`{"person":{"name":"ben","tags":["friend","geog 1000","dog person","cat person"]}}`)
   sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
 
@@ -18,6 +18,7 @@ func setup_simple_test() map[string]Person {
   return test_people_map
 }
 
+// Just test that getting the name returns the correct info
 func Test_basic_name(t *testing.T) {
   pm := setup_simple_test()
 
@@ -80,6 +81,7 @@ func Test_remove_tag_not_present(t *testing.T) {
   }
 }
 
+// Testing the adding of traits to a person
 func Test_add_some_traits_simple(t *testing.T) {
 	pm := setup_simple_test()
 
