@@ -28,7 +28,11 @@ func Test_basic_name(t *testing.T) {
   }
 }
 
-func Test_remove_item_present(t *testing.T) {
+/*
+	Testing deleting a tag from a person.
+	In this test both users have the tag.
+*/
+func Test_remove_tag_present(t *testing.T) {
   pm := setup_simple_test()
 
   tag_to_delete := "cat person"
@@ -47,9 +51,58 @@ func Test_remove_item_present(t *testing.T) {
   if tag_map_steve[tag_to_delete] == true {
     t.Errorf("Tag not deleted: %v", tag_to_delete)
   }
-
 }
 
-func Test_remove_item_not_present(t *testing.T) {
+/*
+	Testing deleting a tag from a person.
+	In this test neither user has the tag.
+	Given the way we are removing tags there should not be any difference
+	between removing items that the person has and those that they do not.
+*/
+func Test_remove_tag_not_present(t *testing.T) {
+	pm := setup_simple_test()
+
+  tag_to_delete := "cat person1"
+
+  p_ben := pm["ben"]
+  p_steve := pm["steve"]
+
+  p_ben.delete_tag(tag_to_delete)
+  tag_map_ben := p_ben.get_person_tags()
+  if tag_map_ben[tag_to_delete] == true {
+    t.Errorf("Tag not deleted: %v", tag_to_delete)
+  }
+
+  p_steve.delete_tag(tag_to_delete)
+  tag_map_steve := p_steve.get_person_tags()
+  if tag_map_steve[tag_to_delete] == true {
+    t.Errorf("Tag not deleted: %v", tag_to_delete)
+  }
+}
+
+func Test_add_some_traits_simple(t *testing.T) {
+	pm := setup_simple_test()
+
+	traits_path := "person.traits"
+
+	p_ben := pm["ben"]
+
+	p_ben.add_trait(traits_path, "relative.brother", "uno")
+	p_ben.add_trait(traits_path, "relative.brother", "tres")
+	p_ben.add_trait(traits_path, "relative.brother", "quad")
+
+	expected_result := `["uno","tres","quad"]`
+	result := p_ben.Json.Path("person.traits.relative.brother").String()
+
+	if result != expected_result {
+		t.Errorf("Expecting: %v But got: %v", expected_result, result)
+	}
+
+	p_ben.add_trait(traits_path, "location.current", "md")
+	expected_result = `"md"`
+	result = p_ben.Json.Path("person.traits.location.current").String()
+	if result != expected_result {
+		t.Errorf("Expecting: %v But got: %v", expected_result, result)
+	}
 
 }

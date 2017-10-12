@@ -17,6 +17,10 @@
 storage/
 storage/*
 
+# Examples just for my reference
+examples/
+examples/*
+
 # Compiled class file
 *.class
 
