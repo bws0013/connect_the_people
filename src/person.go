@@ -199,9 +199,28 @@ func (p Person) t_delete_trait(trait_name string) {
 }
 
 func (p Person) delete_trait(trait_name string) {
-  path := create_path("person.traits", trait_name)
-  err := p.Json.DeleteP(path)
-  check_err(err)
+  current_json := p.Json
+  traits_path := "person.traits"
+
+  path := create_path(traits_path, trait_name)
+  if current_json.ExistsP(path) == false {
+    fmt.Println("dat dog wont hunt")
+    return
+  }
+
+  children, err := current_json.Path(path).Children()
+  if err != nil {
+    err = p.Json.DeleteP(path)
+    check_err(err)
+    return
+  }
+  // current_json.ArrayP(path)
+
+  fmt.Println("=================")
+  fmt.Println(children)
+  fmt.Println("=================")
+
+
 }
 //
 // =========================== bottom
@@ -212,7 +231,8 @@ func (p Person) delete_tag(tag_name string) {
   current_json := p.Json
   tag_path := "person.tags"
 
-  children, _ := current_json.Path(tag_path).Children()
+  children, err := current_json.Path(tag_path).Children()
+  check_err(err)
   current_json.ArrayP(tag_path)
   for _, child := range children {
     tag_string := child.Data().(string)

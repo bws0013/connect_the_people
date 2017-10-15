@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"fmt"
 )
 
 // Most of the simple tests are just going to need a person or two, this generates those people
@@ -105,6 +106,40 @@ func Test_add_some_traits_simple(t *testing.T) {
 	result = p_ben.Json.Path("person.traits.location.current").String()
 	if result != expected_result {
 		t.Errorf("Expecting: %v But got: %v", expected_result, result)
+	}
+}
+
+func Test_delete_single_trait(t *testing.T) {
+
+	pm := setup_simple_test()
+	p_steve := pm["steve"]
+
+	trait_to_delete := "location.current"
+
+	p_steve.delete_trait(trait_to_delete)
+
+	fmt.Println(p_steve.Json)
+
+	if true == false {
+		t.Errorf("Just How?")
+	}
+
+}
+
+// Use this to determine how we are going to end up being able to delete on an array
+func Test_delete_array_trait(t *testing.T) {
+
+	pm := setup_simple_test()
+	p_steve := pm["steve"]
+
+	trait_to_delete := "relative.brother.uno"
+
+	p_steve.delete_trait(trait_to_delete)
+
+	fmt.Println(p_steve.Json)
+
+	if true == false {
+		t.Errorf("Just How?")
 	}
 
 }
