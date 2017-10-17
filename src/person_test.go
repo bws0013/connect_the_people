@@ -118,7 +118,7 @@ func Test_delete_single_trait(t *testing.T) {
 
 	p_steve.delete_trait(trait_to_delete)
 
-	fmt.Println(p_steve.Json)
+	// fmt.Println(p_steve.Json)
 
 	if true == false {
 		t.Errorf("Just How?")
@@ -126,7 +126,22 @@ func Test_delete_single_trait(t *testing.T) {
 
 }
 
+func Test_deep_search(t *testing.T) {
+
+	pm := setup_simple_test()
+	p_steve := pm["steve"]
+
+	p_steve.deep_search("person.traits.relative.brother.uno")
+
+	if true == false {
+		t.Errorf("Just How?")
+	}
+
+}
+
+
 // Use this to determine how we are going to end up being able to delete on an array
+// They could be whole other objects
 func Test_delete_array_trait(t *testing.T) {
 
 	pm := setup_simple_test()
@@ -136,10 +151,13 @@ func Test_delete_array_trait(t *testing.T) {
 
 	p_steve.delete_trait(trait_to_delete)
 
-	fmt.Println(p_steve.Json)
+	//fmt.Println(p_steve.Json)
 
 	if true == false {
 		t.Errorf("Just How?")
 	}
+}
 
+func done() {
+	fmt.Println("done")
 }
