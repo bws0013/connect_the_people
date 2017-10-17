@@ -9,13 +9,16 @@ import (
 func setup_simple_test() map[string]Person {
   sample_ben := []byte(`{"person":{"name":"ben","tags":["friend","geog 1000","dog person","cat person"]}}`)
   sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
+	sample_dave := []byte(`{"person":{"name":"dave","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18"}},{"tres":"nil"},{"quad":"nil"}]}}}}`)
 
   p_ben := new_person_from_data(sample_ben)
   p_steve := new_person_from_data(sample_steve)
+	p_dave := new_person_from_data(sample_dave)
 
   test_people_map := make(map[string]Person)
   test_people_map[p_ben.get_name()] = *p_ben
   test_people_map[p_steve.get_name()] = *p_steve
+	test_people_map[p_dave.get_name()] = *p_dave
   return test_people_map
 }
 
@@ -126,15 +129,20 @@ func Test_delete_single_trait(t *testing.T) {
 
 }
 
+
+// This refers to just getting info from elements that within an array
+// This test isnt one of my program, but rather the functionality of a library
 func Test_deep_search(t *testing.T) {
 
 	pm := setup_simple_test()
-	p_steve := pm["steve"]
+	p_dave := pm["dave"]
 
-	p_steve.deep_search("person.traits.relative.brother.uno")
+	r1 := p_dave.Json.ExistsP("person.traits.relative.brother")
+	r2 := p_dave.Json.ExistsP("person.traits.relative.brother.uno")
+	r3 := p_dave.Json.ExistsP("person.traits.relative.brother.quad")
 
-	if true == false {
-		t.Errorf("Just How?")
+	if !r1 || !r2 || !r3 {
+		t.Errorf("The library must have changed")
 	}
 
 }

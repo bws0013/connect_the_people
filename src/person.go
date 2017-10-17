@@ -182,40 +182,6 @@ func (p Person) add_to_people_map() {
   }
 }
 
-// Given a path find out if it exists but allow for accessing arrays and objects within them
-// This will probably be neccessary for the deleting of traits
-// We may have to return some custom object or something
-func (p Person) deep_search(search_path string) {
-  current_json := p.Json
-  elements := strings.Split(search_path, ".")
-  // last_element := elements[len(elements) - 1]
-
-  // if current_json.ExistsP(path) {
-  //
-  //   // Get an error if there is no array
-  //   _, err := current_json.Path(path).Children()
-
-  current_working_path := elements[0]
-  for i := 1; i < len(elements) + 1; i++ {
-    if current_json.ExistsP(current_working_path) {
-      fmt.Println(current_working_path, "exists")
-    } else {
-      fmt.Println(current_working_path, "does not exist")
-      break
-    }
-    if i == len(elements) { break } // Break to avoid the index out of bounds
-    current_working_path = create_path(current_working_path, elements[i])
-  }
-
-}
-
-// Allow for adding objects to array elements easily
-func (p Person) deep_add(search_path string) {
-  // current_json := p.Json
-
-
-
-}
 
 //
 // =========================== top
