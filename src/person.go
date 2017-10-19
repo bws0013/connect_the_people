@@ -203,17 +203,49 @@ func (p Person) t_delete_trait(trait_name string) {
     fmt.Println("we here")
   }
 
-  obj_test := current_json.Path(path).Data()
+  elements := strings.Split(trait_name, ".")
+  child_to_delete := elements[len(elements) - 1]
+
+  if true == false {
+    fmt.Println(child_to_delete)
+  }
+
+
+  elem, err := current_json.ArrayElementP(1, path)
+  check_err(err)
+
+  fmt.Println(elem)
+
+
+  // c := cc["uno"]
+  // fmt.Println(c)
 
   // if marray, ok := obj_test.([]interface{}); ok {
   //   fmt.Println(marray)
   // }
-  dd, ok := obj_test.([]interface{})
-  fmt.Println(dd)
-  fmt.Println(ok)
+  // dd, ok := obj_test.([]interface{})
+  // fmt.Println(dd)
+  // fmt.Println(ok)
+  //
+  // d := dd[0]
+  // fmt.Println(d.Entities[0])
+  // for _, d := range dd {
+  //   if d != "uno" {
+  //
+  //   }
+  // }
 
-  err := current_json.DeleteP(path)
-  check_err(err)
+  // v := dd["uno"]
+  // fmt.Println(v)
+  // fmt.Println(v["uno"])
+
+  // index_to_delete := -1
+  // for i, d := range dd {
+  //
+  // }
+
+  // err = current_json.DeleteP(path)
+  // check_err(err)
 }
 
 func (p Person) delete_trait(trait_name string) {
