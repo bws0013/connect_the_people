@@ -147,6 +147,20 @@ func Test_deep_search(t *testing.T) {
 
 }
 
+func Test_deep_delete(t *testing.T) {
+
+	pm := setup_simple_test()
+	p_dave := pm["dave"]
+
+
+	fmt.Println(p_dave.Json.String())
+	p_dave.t_delete_trait("relative.brother.uno")
+	fmt.Println(p_dave.Json.String())
+	p_dave.t_delete_trait("relative.brother.quad")
+	fmt.Println(p_dave.Json.String())
+
+}
+
 
 // Use this to determine how we are going to end up being able to delete on an array
 // They could be whole other objects

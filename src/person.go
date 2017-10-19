@@ -195,7 +195,24 @@ This way when we webify we can just keep adding to the path as the page changes
 */
 
 func (p Person) t_delete_trait(trait_name string) {
-  err := p.Json.DeleteP("person.traits.relative")
+  current_json := p.Json
+  path := create_path("person.traits", trait_name)
+  fmt.Println(path)
+
+  if current_json.ExistsP(path) {
+    fmt.Println("we here")
+  }
+
+  obj_test := current_json.Path(path).Data()
+
+  // if marray, ok := obj_test.([]interface{}); ok {
+  //   fmt.Println(marray)
+  // }
+  dd, ok := obj_test.([]interface{})
+  fmt.Println(dd)
+  fmt.Println(ok)
+
+  err := current_json.DeleteP(path)
   check_err(err)
 }
 
