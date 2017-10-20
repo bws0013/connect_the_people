@@ -211,10 +211,10 @@ func (p Person) t_delete_trait(trait_name string) {
   }
 
 
-  elem, err := current_json.ArrayElementP(1, path)
-  check_err(err)
-
-  fmt.Println(elem)
+  // elem, err := current_json.ArrayElementP(1, path)
+  // check_err(err)
+  //
+  // fmt.Println(elem)
 
 
   // c := cc["uno"]
@@ -223,7 +223,26 @@ func (p Person) t_delete_trait(trait_name string) {
   // if marray, ok := obj_test.([]interface{}); ok {
   //   fmt.Println(marray)
   // }
-  // dd, ok := obj_test.([]interface{})
+  my_data := current_json.Path(path).Data()
+
+  dd, ok := my_data.([]interface{})
+  if !ok {
+    fmt.Println("yeah, something is definitely broken")
+    return
+  }
+
+  var interfaceSlice []interface{} = make([]interface{}, 0)
+
+  for i := 0; i < len(dd); i++ {
+    for k, v := range dd[i].(map[string]interface{}) {
+      fmt.Println(k)
+      fmt.Println(v)
+    }
+  }
+
+  fmt.Println(dd)
+  fmt.Println(interfaceSlice)
+
   // fmt.Println(dd)
   // fmt.Println(ok)
   //
