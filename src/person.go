@@ -201,67 +201,58 @@ func (p Person) t_delete_trait(trait_name string) {
 
   if current_json.ExistsP(path) {
     fmt.Println("we here")
+  } else {
+    fmt.Println("Nothing to delete")
+    return
   }
 
-  elements := strings.Split(trait_name, ".")
-  child_to_delete := elements[len(elements) - 1]
-
-  if true == false {
-    fmt.Println(child_to_delete)
+  err := current_json.DeleteP(path)
+  if err == nil {
+    fmt.Println("It has been done.")
   }
 
+  path_elements := strings.Split(path, ".")
+  child_to_delete := path_elements[len(path_elements) - 1]
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
 
-  // elem, err := current_json.ArrayElementP(1, path)
-  // check_err(err)
-  //
-  // fmt.Println(elem)
+  fmt.Println(path)
 
-
-  // c := cc["uno"]
-  // fmt.Println(c)
-
-  // if marray, ok := obj_test.([]interface{}); ok {
-  //   fmt.Println(marray)
-  // }
   my_data := current_json.Path(path).Data()
 
-  dd, ok := my_data.([]interface{})
+  elements, ok := my_data.([]interface{})
   if !ok {
     fmt.Println("yeah, something is definitely broken")
     return
   }
 
-  var interfaceSlice []interface{} = make([]interface{}, 0)
+  var elements_to_keep []interface{} = make([]interface{}, 0)
 
-  for i := 0; i < len(dd); i++ {
-    for k, v := range dd[i].(map[string]interface{}) {
-      fmt.Println(k)
-      fmt.Println(v)
+  for _, element := range elements {
+    for k, _ := range element.(map[string]interface{}) {
+      if k != child_to_delete {
+        elements_to_keep = append(elements_to_keep, element)
+      }
     }
   }
 
-  fmt.Println(dd)
-  fmt.Println(interfaceSlice)
+  fmt.Println(elements_to_keep)
 
-  // fmt.Println(dd)
-  // fmt.Println(ok)
+  // var interfaceSlice []interface{} = make([]interface{}, 0)
+  // for i := 0; i < len(dd); i++ {
+  //   for k, v := range dd[i].(map[string]interface{}) {
+  //     sub_map, ok := v.(map[string]interface{})
+  //     fmt.Println(k)
+  //     fmt.Println(v)
+  //     if ok {
+  //       fmt.Println(sub_map)
+  //     }
   //
-  // d := dd[0]
-  // fmt.Println(d.Entities[0])
-  // for _, d := range dd {
-  //   if d != "uno" {
-  //
+  //     fmt.Println("=======================")
   //   }
   // }
+  // fmt.Println(dd)
+  // fmt.Println(interfaceSlice)
 
-  // v := dd["uno"]
-  // fmt.Println(v)
-  // fmt.Println(v["uno"])
-
-  // index_to_delete := -1
-  // for i, d := range dd {
-  //
-  // }
 
   // err = current_json.DeleteP(path)
   // check_err(err)

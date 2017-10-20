@@ -154,7 +154,7 @@ func Test_deep_delete(t *testing.T) {
 
 
 	// fmt.Println(p_dave.Json.String())
-	p_dave.t_delete_trait("relative.brother")
+	p_dave.t_delete_trait("relative.brother.uno")
 	// fmt.Println(p_dave.Json.String())
 
 
