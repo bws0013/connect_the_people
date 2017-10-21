@@ -10,16 +10,20 @@ func setup_simple_test() map[string]Person {
   sample_ben := []byte(`{"person":{"name":"ben","tags":["friend","geog 1000","dog person","cat person"]}}`)
   sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
 	sample_dave := []byte(`{"person":{"name":"dave","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18"}},{"tres":"nil"},{"quad":"nil"}]}}}}`)
+	sample_stan := []byte(`{"person":{"name":"stan","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18","pet":[{"cat":"cat-do"},{"dog":"dog-do"},{"rat": "rat-do"}]}},{"tres":"dc"},{"quad":"yo"}]}}}}`)
 
   p_ben := new_person_from_data(sample_ben)
   p_steve := new_person_from_data(sample_steve)
 	p_dave := new_person_from_data(sample_dave)
+	p_stan := new_person_from_data(sample_stan)
 
   test_people_map := make(map[string]Person)
   test_people_map[p_ben.get_name()] = *p_ben
   test_people_map[p_steve.get_name()] = *p_steve
 	test_people_map[p_dave.get_name()] = *p_dave
-  return test_people_map
+	test_people_map[p_stan.get_name()] = *p_stan
+
+	return test_people_map
 }
 
 // Just test that getting the name returns the correct info
@@ -150,13 +154,12 @@ func Test_deep_search(t *testing.T) {
 func Test_deep_delete(t *testing.T) {
 
 	pm := setup_simple_test()
-	p_dave := pm["dave"]
+	p := pm["stan"]
 
 
-	// fmt.Println(p_dave.Json.String())
-	p_dave.t_delete_trait("relative.brother.uno")
-	// fmt.Println(p_dave.Json.String())
-
+	p.t_delete_trait("relative.brother.uno.pet")
+	fmt.Println(p.Json.String())
+	fmt.Println("yo")
 
 }
 

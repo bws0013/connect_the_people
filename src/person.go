@@ -225,17 +225,44 @@ func (p Person) t_delete_trait(trait_name string) {
     return
   }
 
-  var elements_to_keep []interface{} = make([]interface{}, 0)
+  // var elements_to_keep []interface{} = make([]interface{}, 0)
+  // // **This one works**
+  // for _, element := range elements {
+  //   for k, _ := range element.(map[string]interface{}) {
+  //     if k != child_to_delete {
+  //       elements_to_keep = append(elements_to_keep, element)
+  //     }
+  //   }
+  // }
+  // fmt.Println(elements_to_keep)
 
-  for _, element := range elements {
+  for n, e := range elements {
+    fmt.Println(n, "->", e)
+    for k, _ := range e.(map[string]interface{}) {
+      fmt.Println(k)
+    }
+  }
+  return
+
+  // *********** down
+  i := -1
+  for num, element := range elements {
+    fmt.Println(num, "->", element)
     for k, _ := range element.(map[string]interface{}) {
-      if k != child_to_delete {
-        elements_to_keep = append(elements_to_keep, element)
+      if k == child_to_delete {
+        i = num
       }
     }
   }
+  if i == -1 {
+    fmt.Println("Not found")
+    return
+  }
+  fmt.Println(i)
+  // err = current_json.ArrayRemoveP(i, path)
+  // check_err(err)
 
-  fmt.Println(elements_to_keep)
+  // *********** up
 
   // var interfaceSlice []interface{} = make([]interface{}, 0)
   // for i := 0; i < len(dd); i++ {
