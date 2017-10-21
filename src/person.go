@@ -225,24 +225,31 @@ func (p Person) t_delete_trait(trait_name string) {
     return
   }
 
-  // var elements_to_keep []interface{} = make([]interface{}, 0)
-  // // **This one works**
-  // for _, element := range elements {
-  //   for k, _ := range element.(map[string]interface{}) {
-  //     if k != child_to_delete {
-  //       elements_to_keep = append(elements_to_keep, element)
-  //     }
-  //   }
-  // }
-  // fmt.Println(elements_to_keep)
+  // childs, err := current_json.Path(path).Children()
+  // check_err(err)
 
-  for n, e := range elements {
-    fmt.Println(n, "->", e)
-    for k, _ := range e.(map[string]interface{}) {
-      fmt.Println(k)
+  sub_elements := elements[0].(interface{})
+  sub_sub_elements := sub_elements.([]interface{})
+  sub_sub_sub_elements := sub_sub_elements[1].(map[string]interface{})
+  fmt.Println(sub_elements)
+  fmt.Println(sub_sub_elements)
+  fmt.Println(sub_sub_sub_elements["dog"])
+  fmt.Println("=========================")
+  return
+
+  var elements_to_keep []interface{} = make([]interface{}, 0)
+  // **This one works**
+  for _, element := range elements {
+    for k, _ := range element.(map[string]interface{}) {
+      if k != child_to_delete {
+        elements_to_keep = append(elements_to_keep, element)
+      }
     }
   }
+  fmt.Println(elements_to_keep)
+
   return
+
 
   // *********** down
   i := -1

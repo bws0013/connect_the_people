@@ -156,8 +156,9 @@ func Test_deep_delete(t *testing.T) {
 	pm := setup_simple_test()
 	p := pm["stan"]
 
-
-	p.t_delete_trait("relative.brother.uno.pet")
+	//p.t_delete_trait("relative.brother.tres")
+	fmt.Println("=========================")
+	p.t_delete_trait("relative.brother.uno.pet.cat")
 	fmt.Println(p.Json.String())
 	fmt.Println("yo")
 
