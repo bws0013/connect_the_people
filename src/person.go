@@ -197,7 +197,80 @@ This way when we webify we can just keep adding to the path as the page changes
 func (p Person) t_delete_trait(trait_name string) {
   current_json := p.Json
   path := create_path("person.traits", trait_name)
-  fmt.Println(path)
+
+  if current_json.ExistsP(path) {
+    
+  } else {
+    fmt.Println("Nothing to delete")
+    return
+  }
+
+
+
+  err := current_json.DeleteP(path)
+  if err == nil {
+    fmt.Println("It has been done.")
+  }
+
+  path_elements := strings.Split(path, ".")
+  child_to_delete := path_elements[len(path_elements) - 1]
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+
+  my_data := current_json.Path(path).Data()
+
+  elements, ok := my_data.([]interface{})
+  if !ok {
+    fmt.Println("yeah, something is definitely broken")
+    return
+  }
+
+  var numbers_to_keep = make([]int, 0)
+  // **This one works**
+  for i, element := range elements {
+    for k, _ := range element.(map[string]interface{}) {
+      if k != child_to_delete {
+        numbers_to_keep = append(numbers_to_keep, i)
+      }
+    }
+  }
+
+  i := -1
+  for num, element := range elements {
+    // fmt.Println(num, "->", element)
+    for k, _ := range element.(map[string]interface{}) {
+      if k == child_to_delete {
+        i = num
+      }
+    }
+  }
+  if i == -1 {
+    fmt.Println("Not found")
+    return
+  }
+  err = current_json.ArrayRemoveP(i, path)
+  check_err(err)
+}
+
+/*
+  TODO: figure out this issue
+  This method will need to be used to delete traits that are contained in
+  nested arrays. At the moment this is a hard problem.
+*/
+func (p Person) dig_to_trait(trait_name string) {
+  // This can iterate through a double deep array
+  // for _, e := range elements {
+  //   sub_elements := e.(interface{})
+  //   sub_sub_elements := sub_elements.([]interface{})
+  //   for _, v0 := range sub_sub_elements {
+  //     sub_sub_sub_elements := v0.(map[string]interface{})
+  //     for _, v1 := range sub_sub_sub_elements {
+  //       fmt.Println(v1)
+  //     }
+  //   }
+  // }
+
+  current_json := p.Json
+  path := create_path("person.traits", trait_name)
 
   if current_json.ExistsP(path) {
     fmt.Println("we here")
@@ -212,10 +285,8 @@ func (p Person) t_delete_trait(trait_name string) {
   }
 
   path_elements := strings.Split(path, ".")
-  child_to_delete := path_elements[len(path_elements) - 1]
-  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
 
-  fmt.Println(path)
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
 
   my_data := current_json.Path(path).Data()
 
@@ -225,71 +296,14 @@ func (p Person) t_delete_trait(trait_name string) {
     return
   }
 
-  // childs, err := current_json.Path(path).Children()
-  // check_err(err)
-
   sub_elements := elements[0].(interface{})
   sub_sub_elements := sub_elements.([]interface{})
-  sub_sub_sub_elements := sub_sub_elements[1].(map[string]interface{})
-  fmt.Println(sub_elements)
-  fmt.Println(sub_sub_elements)
-  fmt.Println(sub_sub_sub_elements["dog"])
-  fmt.Println("=========================")
-  return
-
-  var elements_to_keep []interface{} = make([]interface{}, 0)
-  // **This one works**
-  for _, element := range elements {
-    for k, _ := range element.(map[string]interface{}) {
-      if k != child_to_delete {
-        elements_to_keep = append(elements_to_keep, element)
-      }
-    }
-  }
-  fmt.Println(elements_to_keep)
-
-  return
-
-
-  // *********** down
-  i := -1
-  for num, element := range elements {
-    fmt.Println(num, "->", element)
-    for k, _ := range element.(map[string]interface{}) {
-      if k == child_to_delete {
-        i = num
-      }
-    }
-  }
-  if i == -1 {
-    fmt.Println("Not found")
-    return
-  }
-  fmt.Println(i)
-  // err = current_json.ArrayRemoveP(i, path)
-  // check_err(err)
-
-  // *********** up
-
-  // var interfaceSlice []interface{} = make([]interface{}, 0)
-  // for i := 0; i < len(dd); i++ {
-  //   for k, v := range dd[i].(map[string]interface{}) {
-  //     sub_map, ok := v.(map[string]interface{})
-  //     fmt.Println(k)
-  //     fmt.Println(v)
-  //     if ok {
-  //       fmt.Println(sub_map)
-  //     }
-  //
-  //     fmt.Println("=======================")
-  //   }
-  // }
-  // fmt.Println(dd)
-  // fmt.Println(interfaceSlice)
-
-
-  // err = current_json.DeleteP(path)
-  // check_err(err)
+  sub_sub_sub_elements := sub_sub_elements[0].(map[string]interface{})
+  cat_elements := sub_sub_sub_elements["kittens"]
+  kitten_elements := cat_elements.([]interface{})
+  sub_kitten_elements := kitten_elements[0].(map[string]interface{})
+  name := sub_kitten_elements["male"]
+  fmt.Println(name)
 }
 
 func (p Person) delete_trait(trait_name string) {
@@ -298,7 +312,7 @@ func (p Person) delete_trait(trait_name string) {
 
   path := create_path(traits_path, trait_name)
   if current_json.ExistsP(path) == false {
-    fmt.Println("dat dog wont hunt")
+    // fmt.Println("dat dog wont hunt")
     return
   }
 
