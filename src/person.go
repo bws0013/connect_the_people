@@ -199,7 +199,7 @@ func (p Person) t_delete_trait(trait_name string) {
   path := create_path("person.traits", trait_name)
 
   if current_json.ExistsP(path) {
-    
+
   } else {
     fmt.Println("Nothing to delete")
     return
@@ -350,57 +350,58 @@ func (p Person) delete_tag(tag_name string) {
   }
 }
 
-func main() {
-
-  // traits_path := "person.traits"
-  //
-  // p1 := new_person("ben")
-  // p1.add_tag("friend")
-  // p1.add_tag("geog 1000")
-  //
-  // p2 := new_person("steve")
-  // p2.add_trait(traits_path, "relative.brother", "uno")
-  // // p2.add_trait(traits_path, "relative.sister", "dos")
-  // p2.add_trait(traits_path, "relative.brother", "tres")
-  // p2.add_trait(traits_path, "relative.brother", "quad")
-  // p2.add_trait(traits_path, "location.current", "md")
-  //
-  // p1.add_tag("dog person")
-  // p1.add_tag("cat person")
-  // p2.add_tag("cat person")
-  // //p2.add_trait(traits_path, "relative", "tre")
-  //
-  // // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
-  //
-  // // p2.t_delete_trait("bob")
-  //
-  // // fmt.Println(p1.Name, "->", p2.Name)
-  // // fmt.Println(p1.Json.String())
-  // // fmt.Println(p2.Json.String())
-  // //
-  // //
-  // //
-  // // p2.get_person_trails()
-  // p1.add_to_people_map()
-  // p2.add_to_people_map()
-
-  fmt.Println(get_all_people_with_tag("cat person", people_map))
-  // get_all_people_with_tag("dog person")
-  // get_all_people_with_tag("rhino person")
-
-  // export_people_to_file()
-  import_people_from_file()
-
-  for _, p := range people_map {
-    fmt.Print(p.get_name(), " ")
-    fmt.Println(p.get_person_tags())
-    p.delete_tag("cat person")
-    fmt.Print(p.get_name(), " ")
-    fmt.Println(p.get_person_tags())
-    fmt.Println("==========================")
-  }
-  fmt.Println(get_all_people_with_tag("cat person", people_map))
-}
+// Uncomment for main
+// func main() {
+//
+//   // traits_path := "person.traits"
+//   //
+//   // p1 := new_person("ben")
+//   // p1.add_tag("friend")
+//   // p1.add_tag("geog 1000")
+//   //
+//   // p2 := new_person("steve")
+//   // p2.add_trait(traits_path, "relative.brother", "uno")
+//   // // p2.add_trait(traits_path, "relative.sister", "dos")
+//   // p2.add_trait(traits_path, "relative.brother", "tres")
+//   // p2.add_trait(traits_path, "relative.brother", "quad")
+//   // p2.add_trait(traits_path, "location.current", "md")
+//   //
+//   // p1.add_tag("dog person")
+//   // p1.add_tag("cat person")
+//   // p2.add_tag("cat person")
+//   // //p2.add_trait(traits_path, "relative", "tre")
+//   //
+//   // // fmt.Println(p2.Json.ExistsP("person.traits.relative"))
+//   //
+//   // // p2.t_delete_trait("bob")
+//   //
+//   // // fmt.Println(p1.Name, "->", p2.Name)
+//   // // fmt.Println(p1.Json.String())
+//   // // fmt.Println(p2.Json.String())
+//   // //
+//   // //
+//   // //
+//   // // p2.get_person_trails()
+//   // p1.add_to_people_map()
+//   // p2.add_to_people_map()
+//
+//   fmt.Println(get_all_people_with_tag("cat person", people_map))
+//   // get_all_people_with_tag("dog person")
+//   // get_all_people_with_tag("rhino person")
+//
+//   // export_people_to_file()
+//   import_people_from_file()
+//
+//   for _, p := range people_map {
+//     fmt.Print(p.get_name(), " ")
+//     fmt.Println(p.get_person_tags())
+//     p.delete_tag("cat person")
+//     fmt.Print(p.get_name(), " ")
+//     fmt.Println(p.get_person_tags())
+//     fmt.Println("==========================")
+//   }
+//   fmt.Println(get_all_people_with_tag("cat person", people_map))
+// }
 
 // Support methods
 
