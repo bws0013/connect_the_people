@@ -40,9 +40,9 @@ func (p Person) change_json(trait_name string) {
   fmt.Println(my_data)
 
 
-  // fmt.Println(current_json.Path(path))
+  fmt.Println(path)
 
-  current_json.ArrayP(path)
+  p.Json.SetP(20, path)
 
   check_err(err)
   for key, child := range children {
@@ -51,7 +51,7 @@ func (p Person) change_json(trait_name string) {
     current_json.Index(0).SetIndex(child, 0)
   }
 
-  fmt.Println(current_json)
+  fmt.Println(p.Json)
   /*
   elements, ok := my_data.([]interface{})
   if !ok {
