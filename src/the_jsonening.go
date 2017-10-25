@@ -29,20 +29,29 @@ func (p Person) change_json(trait_name string) {
 
   path = strings.Join(path_elements[:len(path_elements) - 1], ".")
 
-  path = create_path("person.traits", trait_name)
+  // path = create_path("person.traits", trait_name) // For actual path
+
 
   my_data := current_json.Path(path).Index(0)
   children, err := my_data.Children()
+  check_err(err)
+
+
+  fmt.Println(my_data)
+
+
+  // fmt.Println(current_json.Path(path))
 
   current_json.ArrayP(path)
 
   check_err(err)
   for key, child := range children {
-  	fmt.Println(key, "->", child.Index(0))
-    current_json.ArrayAppendP(child, path)
+  	fmt.Println(key, "->", child.Index(0).Data())
+    //current_json.ArrayAppendP(child, path)
+    current_json.Index(0).SetIndex(child, 0)
   }
 
-
+  fmt.Println(current_json)
   /*
   elements, ok := my_data.([]interface{})
   if !ok {
