@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// https://golang.org/doc/articles/wiki/
+
 var (
   file_location = "./../storage/Pages/"
 )
@@ -35,7 +37,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
 }
 
-func main() {
-	http.HandleFunc("/view/", viewHandler)
-	http.ListenAndServe(":8080", nil)
-}
+// func main() {
+// 	http.HandleFunc("/view/", viewHandler)
+// 	http.ListenAndServe(":8080", nil)
+// }
