@@ -2,7 +2,6 @@ package main
 
 import (
   "fmt"
-  "log"
   "strings"
   "github.com/buger/jsonparser"
 )
@@ -10,7 +9,7 @@ import (
 var (
   polly = []byte(`{"person":{"name":"polly","traits":{"relative":{"brother":[{"uno":{"pet":[{"cat":"cat-do","kittens":[{"male":"one"},{"female":"two"}]},"dog","rat"]}}]}}}}`)
   edwin = []byte(`{"person":{"name":"edwin","traits":{"relative":{"brother":[{"uno":{"pet":[{"cat":"cat-do","kittens":[{"male":"one"},{"female":"two"}]},{"dog":"dog-do"},{"rat":"rat-do"}]}}]}}}}`)
-  path = "person.traits.relative.brother.[0].uno.pet.[1]"
+  path = "person.traits.relative.brother.[0].uno.pet"
 )
 
 func main() {
@@ -18,10 +17,22 @@ func main() {
   // create_this_person("joe")
   // return
 
-  val, _, _, err := jsonparser.Get(polly, fix_path(path)...)
+  arr := [2]string{"hello", "world"}
+
+  fmt.Println(arr)
+
+  val, ty, _, err := jsonparser.Get(polly, fix_path(path)...)
   check_err(err)
   fmt.Printf("%s\n", val)
+  fmt.Println(ty)
 
+  jsonparser.ArrayEach(val, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+    element, _, _, err := jsonparser.Get(value, "kittens")
+    check_err(err)
+    fmt.Printf("-> %s\n", element)
+  })
+
+  fmt.Println("done")
 
   // val, _, _, err := jsonparser.Get(edwin, fix_path(path)...)
   // check_err(err)
@@ -50,8 +61,8 @@ func fix_path(path string) []string {
 }
 
 // Break if there is an error passed in
-func check_err(err error) {
-  if err != nil {
-    log.Fatal(err)
-  }
-}
+// func check_err(err error) {
+//   if err != nil {
+//     log.Fatal(err)
+//   }
+// }

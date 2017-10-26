@@ -3,7 +3,62 @@ package main
 import (
   "fmt"
   "strings"
+  "github.com/Jeffail/gabs"
 )
+
+func (p Person) not_my_json(trait_name string) {
+  current_json := p.Json
+
+  path := create_path("person.traits", trait_name)
+  if current_json.ExistsP(path) {
+    fmt.Println("we here")
+  } else {
+    fmt.Println("Nothing to delete")
+    return
+  }
+
+  err := current_json.DeleteP(path)
+  if err == nil {
+    fmt.Println("It has been done.")
+  }
+
+  path_elements := strings.Split(path, ".")
+
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+
+  my_data := current_json.Path(path)
+  children, err := my_data.Children()
+  check_err(err)
+
+  for _, child := range children {
+    kiddos, err := child.Children()
+    check_err(err)
+    fmt.Println(child)
+    for _, kiddo := range kiddos {
+      kidling, err := kiddo.Children()
+      check_err(err)
+      fmt.Println(kidling)
+
+
+
+      jsonObj := gabs.New()
+      jsonObj.Set(10, "foo")
+
+      fmt.Println(jsonObj)
+
+      val, err := current_json.Path(path).Index(0).Index(0).SetIndex(jsonObj.String(), 0)
+      check_err(err)
+      fmt.Println(val)
+      //current_json.SetP("hello", path)
+    }
+  }
+  fmt.Println(path)
+  fmt.Println(current_json)
+
+
+  // fmt.Println(children)
+
+}
 
 /*
   lol, when you dont read the instructions
