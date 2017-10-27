@@ -11,7 +11,7 @@ func setup_simple_test() map[string]Person {
   sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
 	sample_dave := []byte(`{"person":{"name":"dave","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18"}},{"tres":"nil"},{"quad":"nil"}]}}}}`)
 	sample_stan := []byte(`{"person":{"name":"stan","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18","pet":[{"cat":"cat-do"},{"dog":"dog-do"},{"rat": "rat-do"}]}},{"tres":"dc"},{"quad":"yo"}]}}}}`)
-	sample_edwin := []byte(`{"person":{"name":"edwin","traits":{"relative":{"brother":[{"uno":{"pet":[{"cat":"cat-do","kittens":[{"male":"one"},{"female":"two"}]},{"dog":"dog-do"},{"rat":"rat-do"}]}}]}}}}`)
+	sample_edwin := []byte(`{"person":{"name":"edwin","traits":{"relative":{"brother":[{"uno":{"pet":[{"cat":"cat-do","kittens":[{"male":"one"},{"female":"two"},"third"]},{"dog":"dog-do"},{"rat":"rat-do"}]}}]}}}}`)
 
   p_ben := new_person_from_data(sample_ben)
   p_steve := new_person_from_data(sample_steve)
@@ -166,7 +166,7 @@ func Test_deep_delete(t *testing.T) {
 func Test_deep_delete_nested(t *testing.T) {
 	pm := setup_simple_test()
 	p := pm["edwin"]
-	p.not_my_json("relative.brother.uno.pet.kittens.male")
+	p.true_delete("relative.brother.uno.pet.kittens.male")
 	// fmt.Println(p.Json)
 }
 

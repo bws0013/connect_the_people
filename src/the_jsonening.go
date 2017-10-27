@@ -44,13 +44,14 @@ func (p Person) not_my_json(trait_name string) {
 
 
 
-      jsonObj := gabs.New()
-      jsonObj.Set("10", "foo")
-      sub_ob := jsonObj.Path("foo").Data()
+      // jsonObj := gabs.New()
+      // jsonObj.Set("10", "foo")
+      // sub_ob := jsonObj.Path("foo").Data()
+      //
+      // fmt.Println(jsonObj.String())
 
-      fmt.Println(jsonObj.String())
-
-      val, err := current_json.Path(path).Index(0).Index(0).SetIndex(sub_ob, 0)
+      // TODO: test our ability to for loop the below
+      val, err := current_json.Path(path).Index(0).Index(0).SetIndex("dude", 0)
       check_err(err)
       fmt.Println(val)
       //current_json.SetP("hello", path)
@@ -62,6 +63,76 @@ func (p Person) not_my_json(trait_name string) {
 
   // fmt.Println(children)
 
+}
+
+func (p Person) true_delete(trait_name string) {
+  current_json := p.Json
+
+  path := create_path("person.traits", trait_name)
+  if current_json.ExistsP(path) {
+    fmt.Println("we here")
+  } else {
+    fmt.Println("Nothing to delete")
+    return
+  }
+
+  err := current_json.DeleteP(path)
+  if err == nil {
+    fmt.Println("It has been done.")
+  }
+
+  path_elements := strings.Split(path, ".")
+
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+  element_to_delete := path_elements[len(path_elements) - 1]
+  fmt.Println("To Delete:", element_to_delete)
+
+  my_data := current_json.Path(path)
+
+  element_depth := obtain_array_count(my_data.String())
+
+  children, err := my_data.Children()
+  check_err(err)
+  for i := 0; i < element_depth - 1; i++ {
+    for _, child := range children {
+      children, err = child.Children()
+      check_err(err)
+    }
+  }
+
+  jsonObj := gabs.New()
+  jsonObj.Array("foo", "array")
+
+  for _, child := range children {
+    potential_target := child.String()
+    target_split := strings.Split(potential_target, ":")
+    if clean_text(target_split[0]) == element_to_delete {
+
+    } else {
+      jsonObj.ArrayAppend(child.Data(), "foo", "array")
+    }
+  }
+
+  new_arr := jsonObj.Path("foo.array")
+  fmt.Println(new_arr)
+
+  _, err := current_json.Path(path).Index(0).Index(0).SetIndex(new_arr, 0)
+  check_err(err)
+
+  fmt.Println(current_json)
+
+  // fmt.Println(my_data)
+}
+
+func clean_text(text string) string {
+  temp := strings.Replace(text, "{", "", -1)
+  if temp[0] == '"' {
+    temp = temp[1:]
+  }
+  if temp[len(temp) - 1] == '"' {
+    temp = temp[:len(temp) - 1]
+  }
+  return temp
 }
 
 func obtain_array_count(text string) int {
