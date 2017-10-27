@@ -26,7 +26,10 @@ func (p Person) not_my_json(trait_name string) {
 
   path = strings.Join(path_elements[:len(path_elements) - 1], ".")
 
+  // path = create_path("person.traits", trait_name)
   my_data := current_json.Path(path)
+  fmt.Println(my_data.String())
+
   children, err := my_data.Children()
   check_err(err)
 
@@ -42,11 +45,12 @@ func (p Person) not_my_json(trait_name string) {
 
 
       jsonObj := gabs.New()
-      jsonObj.Set(10, "foo")
+      jsonObj.Set("10", "foo")
+      sub_ob := jsonObj.Path("foo").Data()
 
-      fmt.Println(jsonObj)
+      fmt.Println(jsonObj.String())
 
-      val, err := current_json.Path(path).Index(0).Index(0).SetIndex(jsonObj.String(), 0)
+      val, err := current_json.Path(path).Index(0).Index(0).SetIndex(sub_ob, 0)
       check_err(err)
       fmt.Println(val)
       //current_json.SetP("hello", path)
@@ -58,6 +62,18 @@ func (p Person) not_my_json(trait_name string) {
 
   // fmt.Println(children)
 
+}
+
+func obtain_array_count(text string) int {
+  count := 0
+  for _, elem := range text {
+    if elem == '[' {
+      count++
+    } else {
+      break
+    }
+  }
+  return count
 }
 
 /*
