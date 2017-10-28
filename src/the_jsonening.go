@@ -116,7 +116,12 @@ func (p Person) true_delete(trait_name string) {
   new_arr := jsonObj.Path("foo.array")
   fmt.Println(new_arr)
 
-  _, err = current_json.Path(path).Index(0).Index(0).SetIndex(new_arr, 0)
+  current_val := current_json.Path(path)
+  check_err(err)
+  for i := 0; i < element_depth - 1; i++ {
+    current_val = current_val.Index(0)
+  }
+  _, err = current_val.SetIndex(new_arr, 0)
   check_err(err)
 
   // fmt.Println(my_data)
