@@ -69,14 +69,16 @@ func (p Person) true_delete(trait_name string) {
 
   kind := gabs.New()
   for _, kind = range kinder {
-    check_err(err)
-    fmt.Println(kind)
+    if kind.ExistsP(element_to_delete) {
+      kind.DeleteP(element_to_delete)
+      fmt.Println(kind)
+    }
   }
-  value := kind.DeleteP("rat")
-  check_err(value)
 
+  if true == false {
   _, err = current_val.SetIndex(new_arr, 0)
   check_err(err)
+  }
 
   // fmt.Println(my_data)
 }
