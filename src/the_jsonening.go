@@ -67,10 +67,13 @@ func (p Person) true_delete(trait_name string) {
   fmt.Println("->", current_val)
   kinder, err := current_val.Children()
 
-  for _, kind := range kinder {
+  kind := gabs.New()
+  for _, kind = range kinder {
     check_err(err)
     fmt.Println(kind)
   }
+  value := kind.DeleteP("rat")
+  check_err(value)
 
   _, err = current_val.SetIndex(new_arr, 0)
   check_err(err)
