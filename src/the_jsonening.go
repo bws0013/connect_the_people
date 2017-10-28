@@ -116,12 +116,26 @@ func (p Person) true_delete(trait_name string) {
   new_arr := jsonObj.Path("foo.array")
   fmt.Println(new_arr)
 
-  _, err := current_json.Path(path).Index(0).Index(0).SetIndex(new_arr, 0)
+  _, err = current_json.Path(path).Index(0).Index(0).SetIndex(new_arr, 0)
   check_err(err)
 
-  fmt.Println(current_json)
-
   // fmt.Println(my_data)
+}
+
+// This may have some bad consequences down the line, warrents further investigation
+func (p Person) clean_json() Person {
+  current_json_text := p.Json.String()
+  if current_json_text == "{}" { return p }
+  replacer := strings.NewReplacer(
+    "{},", "",
+    "{}", "",
+    "[],", "",
+    "[]", "")
+  temp := replacer.Replace(current_json_text)
+  new_json, err := gabs.ParseJSON([]byte(temp))
+  check_err(err)
+  p.Json = new_json
+  return p
 }
 
 func clean_text(text string) string {

@@ -167,7 +167,7 @@ func Test_deep_delete_nested(t *testing.T) {
 	pm := setup_simple_test()
 	p := pm["edwin"]
 	p.true_delete("relative.brother.uno.pet.kittens.male")
-	// fmt.Println(p.Json)
+	fmt.Println(p.Json)
 }
 
 
