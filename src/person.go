@@ -74,6 +74,7 @@ func (p Person) add_trait(trait_path, trait_name, trait_text string) {
     if err != nil {
       // Get the original value (that isnt an array)
       current_val := current_json.Path(path).Data()
+
       // Create an array
       current_json.ArrayP(path)
       // Add the original value to the array
@@ -115,7 +116,6 @@ func (p Person) add_tag(tag_name string) error {
   } else {
     return errors.New("This tag has been previously assinged, try another.")
   }
-
 }
 
 // This will have some content at some point to ensure uniquity among tags
@@ -182,157 +182,82 @@ func (p Person) add_to_people_map() {
   }
 }
 
+// Simplifying delete
+func (p Person) delete_trait(trait_name string) {
+  current_json := p.Json
+
+  path := create_path("person.traits", trait_name)
+  if current_json.ExistsP(path) {
+    // fmt.Println("we here")
+  } else {
+    fmt.Println("Attempting array deletion")
+    p.delete_single_trait_object(trait_name)
+    return
+  }
+
+  path_elements := strings.Split(path, ".")
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+  element_to_delete := path_elements[len(path_elements) - 1]
+
+  my_data := current_json.Path(path)
+  element_depth := obtain_array_count(my_data.String())
+  current_val := current_json.Path(path)
+  for i := 0; i < element_depth - 1; i++ {
+    current_val = current_val.Index(0)
+  }
+
+  kinder, err := current_val.Children()
+  check_err(err)
+
+  for _, kind := range kinder {
+    if kind.ExistsP(element_to_delete) {
+      err = kind.DeleteP(element_to_delete)
+      check_err(err)
+    }
+  }
+
+  fmt.Println(current_json)
+}
 
 //
 // =========================== top
 //
 
-// Figure out deleting traits effectively
-/*
-We may want to try adding to a predefined path
-ie default path = person.traits, then we add to that, such as .relative.brother
-This way when we webify we can just keep adding to the path as the page changes
-*/
-
-func (p Person) t_delete_trait(trait_name string) {
+func (p Person) delete_single_trait_object(trait_name string) {
   current_json := p.Json
+
   path := create_path("person.traits", trait_name)
+
+  path_elements := strings.Split(path, ".")
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+  element_to_delete := path_elements[len(path_elements) - 1]
+
+  // fmt.Println("delete ->", element_to_delete)
 
   if current_json.ExistsP(path) {
 
-  } else {
-    fmt.Println("Nothing to delete")
-    return
-  }
+    // Get an error if there is no array
+    children, err := current_json.Path(path).Children()
 
+    // Return if there is no array
+    if err != nil {
+      return
+    }
 
-
-  err := current_json.DeleteP(path)
-  if err == nil {
-    fmt.Println("It has been done.")
-  }
-
-  path_elements := strings.Split(path, ".")
-  child_to_delete := path_elements[len(path_elements) - 1]
-  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
-
-  my_data := current_json.Path(path).Data()
-
-  elements, ok := my_data.([]interface{})
-  if !ok {
-    fmt.Println("yeah, something is definitely broken")
-    return
-  }
-
-  var numbers_to_keep = make([]int, 0)
-  // **This one works**
-  for i, element := range elements {
-    for k, _ := range element.(map[string]interface{}) {
-      if k != child_to_delete {
-        numbers_to_keep = append(numbers_to_keep, i)
+    current_json.ArrayP(path)
+    for _, child := range children {
+      arr_string := child.Data().(string)
+      if arr_string != element_to_delete {
+        current_json.ArrayAppendP(arr_string, path)
       }
     }
   }
-
-  i := -1
-  for num, element := range elements {
-    // fmt.Println(num, "->", element)
-    for k, _ := range element.(map[string]interface{}) {
-      if k == child_to_delete {
-        i = num
-      }
-    }
-  }
-  if i == -1 {
-    fmt.Println("Not found")
-    return
-  }
-  err = current_json.ArrayRemoveP(i, path)
-  check_err(err)
 }
 
-/*
-  TODO: figure out this issue
-  This method will need to be used to delete traits that are contained in
-  nested arrays. At the moment this is a hard problem.
-*/
-func (p Person) dig_to_trait(trait_name string) {
-  // This can iterate through a double deep array
-  // for _, e := range elements {
-  //   sub_elements := e.(interface{})
-  //   sub_sub_elements := sub_elements.([]interface{})
-  //   for _, v0 := range sub_sub_elements {
-  //     sub_sub_sub_elements := v0.(map[string]interface{})
-  //     for _, v1 := range sub_sub_sub_elements {
-  //       fmt.Println(v1)
-  //     }
-  //   }
-  // }
-
-  current_json := p.Json
-  path := create_path("person.traits", trait_name)
-
-  if current_json.ExistsP(path) {
-    fmt.Println("we here")
-  } else {
-    fmt.Println("Nothing to delete")
-    return
-  }
-
-  err := current_json.DeleteP(path)
-  if err == nil {
-    fmt.Println("It has been done.")
-  }
-
-  path_elements := strings.Split(path, ".")
-
-  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
-
-  my_data := current_json.Path(path).Data()
-
-  elements, ok := my_data.([]interface{})
-  if !ok {
-    fmt.Println("yeah, something is definitely broken")
-    return
-  }
-
-  sub_elements := elements[0].(interface{})
-  sub_sub_elements := sub_elements.([]interface{})
-  sub_sub_sub_elements := sub_sub_elements[0].(map[string]interface{})
-  cat_elements := sub_sub_sub_elements["kittens"]
-  kitten_elements := cat_elements.([]interface{})
-  sub_kitten_elements := kitten_elements[0].(map[string]interface{})
-  name := sub_kitten_elements["male"]
-  fmt.Println(name)
-}
-
-func (p Person) delete_trait(trait_name string) {
-  current_json := p.Json
-  traits_path := "person.traits"
-
-  path := create_path(traits_path, trait_name)
-  if current_json.ExistsP(path) == false {
-    // fmt.Println("dat dog wont hunt")
-    return
-  }
-
-  children, err := current_json.Path(path).Children()
-  if err != nil {
-    err = p.Json.DeleteP(path)
-    check_err(err)
-    return
-  }
-  // current_json.ArrayP(path)
-
-  fmt.Println("=================")
-  fmt.Println(children)
-  fmt.Println("=================")
-
-
-}
 //
 // =========================== bottom
 //
+
 
 // Delete a tag from a user
 func (p Person) delete_tag(tag_name string) {
@@ -404,6 +329,28 @@ func (p Person) delete_tag(tag_name string) {
 // }
 
 // Support methods
+
+func format_trait(trait string) string {
+  temp := "\"" + trait + "\"" // "trait"
+  temp = temp + ":\"nil\"" // "trait":"nil"
+  temp = "{" + temp + "}"
+
+  // temp := trait + ":nil"
+  // temp = "{" + temp + "}"
+  return temp
+}
+
+func obtain_array_count(text string) int {
+  count := 0
+  for _, elem := range text {
+    if elem == '[' {
+      count++
+    } else {
+      break
+    }
+  }
+  return count
+}
 
 // Import people json objects from a file
 func import_people_from_file() {
