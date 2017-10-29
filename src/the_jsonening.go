@@ -59,7 +59,6 @@ func (p Person) true_delete(trait_name string) {
   // fmt.Println(new_arr)
 
   current_val := current_json.Path(path)
-  check_err(err)
   for i := 0; i < element_depth - 1; i++ {
     current_val = current_val.Index(0)
   }
@@ -79,8 +78,42 @@ func (p Person) true_delete(trait_name string) {
   _, err = current_val.SetIndex(new_arr, 0)
   check_err(err)
   }
-
   // fmt.Println(my_data)
+}
+
+// Simplifying delete
+func (p Person) new_delete(trait_name string) {
+  current_json := p.Json
+
+  path := create_path("person.traits", trait_name)
+  if current_json.ExistsP(path) {
+    // fmt.Println("we here")
+  } else {
+    fmt.Println("Nothing to delete")
+    return
+  }
+
+  path_elements := strings.Split(path, ".")
+  path = strings.Join(path_elements[:len(path_elements) - 1], ".")
+  element_to_delete := path_elements[len(path_elements) - 1]
+
+  my_data := current_json.Path(path)
+  element_depth := obtain_array_count(my_data.String())
+  current_val := current_json.Path(path)
+  for i := 0; i < element_depth - 1; i++ {
+    current_val = current_val.Index(0)
+  }
+
+  kinder, err := current_val.Children()
+  check_err(err)
+
+  for _, kind := range kinder {
+    if kind.ExistsP(element_to_delete) {
+      fmt.Println(kind)
+      err = kind.DeleteP(element_to_delete)
+      check_err(err)
+    }
+  }
 }
 
 // This may have some bad consequences down the line, warrents further investigation
