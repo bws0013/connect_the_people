@@ -119,6 +119,8 @@ func Test_add_some_traits_simple(t *testing.T) {
 	}
 }
 
+// TODO make this test case
+// Seeing if we can delete a single element of a person
 func Test_delete_single_trait(t *testing.T) {
 
 	pm := setup_simple_test()
@@ -135,37 +137,36 @@ func Test_delete_single_trait(t *testing.T) {
 	}
 }
 
+func Test_get_person_traits(t *testing.T) {
+
+	pm := setup_simple_test()
+	simple_person := pm["steve"]
+
+	trait_map := simple_person.get_person_traits()
+	
+	// for _, v := range trait_map {
+	// 	fmt.Printf("%v\n", v)
+	// }
+	val, ok := trait_map["current"]
+	fmt.Println(val, "->", ok)
+
+}
+
 // Use this to determine how we are going to end up being able to delete on an array
 // They could be whole other objects
 func Test_delete_array_trait(t *testing.T) {
 
 	pm := setup_simple_test()
 	p_steve := pm["steve"]
+	current_json := p_steve.Json
 
-	trait_to_delete := "relative.brother.uno"
+	trait_to_delete := "relative.brother"
 
 	p_steve.delete_trait(trait_to_delete)
 
-	fmt.Println(p_steve.Json)
-	fmt.Println("Done")
-	if true == false {
-		t.Errorf("Just How?")
+	if current_json.ExistsP(trait_to_delete) == true {
+		t.Errorf("We are still seeing the element we want to delete")
 	}
-}
-
-func Test_delete_single_trait_object(t *testing.T) {
-	// pm := setup_simple_test()
-	// p_steve := pm["steve"]
-	//
-	// trait_to_delete := "relative.brother.uno"
-	//
-	// p_steve.delete_single_trait_object(trait_to_delete)
-	//
-	// fmt.Println(p_steve.Json)
-	//
-	// if true == false {
-	// 	t.Errorf("Just How?")
-	// }
 }
 
 
@@ -184,14 +185,6 @@ func Test_deep_search(t *testing.T) {
 		t.Errorf("The library must have changed")
 	}
 
-}
-
-func Test_new_delete(t *testing.T) {
-	// pm := setup_simple_test()
-	// p := pm["edwin"]
-	// fmt.Println(p.Json)
-	// p.new_delete("relative.brother.uno.pet.kittens")
-	// fmt.Println(p.Json)
 }
 
 func done() {

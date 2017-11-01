@@ -36,6 +36,7 @@ func new_person(name_in string) *Person {
   return p
 }
 
+// Create a new person from a byte array
 func new_person_from_data(person_data []byte) *Person {
 
   p := new(Person)
@@ -161,12 +162,14 @@ func (p Person) get_person_tags() map[string]bool {
 
 // TODO the get_person_traits method
 // This should get the traits of a person, it currently doesnt
-func (p Person) get_person_traits() {
-  children, err := p.Json.S("tags").ChildrenMap()
+func (p Person) get_person_traits() map[string]*gabs.Container {
+  current_json := p.Json
+
+  json_map := current_json.Path("person.traits")
+
+  children, err := json_map.ChildrenMap()
   check_err(err)
-  for key, child := range children {
-  	fmt.Printf("key: %v, value: %v\n", key, child.Data().(string))
-  }
+  return children
 }
 
 // Get the name of a person
@@ -215,14 +218,16 @@ func (p Person) delete_trait(trait_name string) {
       check_err(err)
     }
   }
-
-  fmt.Println(current_json)
 }
 
 //
 // =========================== top
 //
 
+/*
+  Delete a trait from an array where the trait is the smallest objects
+  Example: Deleting "1" from ["1", {"2":"yo"}, "3"]
+*/
 func (p Person) delete_single_trait_object(trait_name string) {
   current_json := p.Json
 
@@ -330,16 +335,7 @@ func (p Person) delete_tag(tag_name string) {
 
 // Support methods
 
-func format_trait(trait string) string {
-  temp := "\"" + trait + "\"" // "trait"
-  temp = temp + ":\"nil\"" // "trait":"nil"
-  temp = "{" + temp + "}"
-
-  // temp := trait + ":nil"
-  // temp = "{" + temp + "}"
-  return temp
-}
-
+// Obtain how many layers deep an array is
 func obtain_array_count(text string) int {
   count := 0
   for _, elem := range text {
