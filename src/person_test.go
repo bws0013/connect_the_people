@@ -119,36 +119,35 @@ func Test_add_some_traits_simple(t *testing.T) {
 	}
 }
 
-// TODO make this test case
-// Seeing if we can delete a single element of a person
+// Seeing if we can delete a single trait of a person
 func Test_delete_single_trait(t *testing.T) {
 
 	pm := setup_simple_test()
 	p_steve := pm["steve"]
 
+	current_json := p_steve.Json
+
 	trait_to_delete := "location.current"
 
 	p_steve.delete_trait(trait_to_delete)
 
-	// fmt.Println(p_steve.Json)
-
-	if true == false {
-		t.Errorf("Just How?")
+	if current_json.ExistsP("person.traits" + trait_to_delete) {
+		t.Errorf("We are still seeing the element we want to delete")
 	}
 }
 
+// Test of my function for getting a persons traits
 func Test_get_person_traits(t *testing.T) {
 
 	pm := setup_simple_test()
 	simple_person := pm["steve"]
 
 	trait_map := simple_person.get_person_traits()
-	
-	// for _, v := range trait_map {
-	// 	fmt.Printf("%v\n", v)
-	// }
-	val, ok := trait_map["current"]
-	fmt.Println(val, "->", ok)
+
+	_, ok := trait_map["location"]
+	if ok != true {
+		t.Errorf("Getting traits is not working")
+	}
 
 }
 
@@ -164,7 +163,7 @@ func Test_delete_array_trait(t *testing.T) {
 
 	p_steve.delete_trait(trait_to_delete)
 
-	if current_json.ExistsP(trait_to_delete) == true {
+	if current_json.ExistsP("person.traits" + trait_to_delete) {
 		t.Errorf("We are still seeing the element we want to delete")
 	}
 }

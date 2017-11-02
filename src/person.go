@@ -190,10 +190,15 @@ func (p Person) delete_trait(trait_name string) {
   current_json := p.Json
 
   path := create_path("person.traits", trait_name)
+
+  // If we can see the object, ie it has a mapped value
   if current_json.ExistsP(path) {
-    // fmt.Println("we here")
+    err := current_json.DeleteP(path)
+    if err == nil {
+      return
+    }
   } else {
-    fmt.Println("Attempting array deletion")
+    // If we cant see the object, ie it might not have a mapped value
     p.delete_single_trait_object(trait_name)
     return
   }
@@ -219,10 +224,6 @@ func (p Person) delete_trait(trait_name string) {
     }
   }
 }
-
-//
-// =========================== top
-//
 
 /*
   Delete a trait from an array where the trait is the smallest objects
@@ -258,11 +259,6 @@ func (p Person) delete_single_trait_object(trait_name string) {
     }
   }
 }
-
-//
-// =========================== bottom
-//
-
 
 // Delete a tag from a user
 func (p Person) delete_tag(tag_name string) {
