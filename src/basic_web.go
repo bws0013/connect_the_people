@@ -1,43 +1,75 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
+    "encoding/json"
+    "log"
+    "net/http"
+    "github.com/gorilla/mux"
 )
 
-// https://golang.org/doc/articles/wiki/
+type Person struct {
+    ID        string   `json:"id,omitempty"`
+    Firstname string   `json:"firstname,omitempty"`
+    Lastname  string   `json:"lastname,omitempty"`
+    Address   *Address `json:"address,omitempty"`
+}
+type Address struct {
+    City  string `json:"city,omitempty"`
+    State string `json:"state,omitempty"`
+}
 
 var (
-  file_location = "./../storage/Pages/"
+	people []Person
 )
 
-type Page struct {
-	Title string
-	Body  []byte
+// Copying from here: https://www.codementor.io/codehakase/building-a-restful-api-with-golang-a6yivzqdo
+
+// our main function
+func main() {
+
+	router := mux.NewRouter()
+	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
+	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
+
+  router.HandleFunc("/people", GetPeople).Methods("GET")
+  router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
+  router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
+  router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")
+  log.Fatal(http.ListenAndServe(":8000", router))
 }
 
-func (p *Page) save() error {
-	filename := file_location + p.Title + ".txt"
-	return ioutil.WriteFile(filename, p.Body, 0600)
+func GetPeople(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(people)
 }
 
-func loadPage(title string) (*Page, error) {
-	filename := file_location + title + ".txt"
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
+func GetPerson(w http.ResponseWriter, r *http.Request) {
+  params := mux.Vars(r)
+  for _, item := range people {
+    if item.ID == params["id"] {
+      json.NewEncoder(w).Encode(item)
+      return
+    }
+  }
+  json.NewEncoder(w).Encode(&Person{})
+}
+
+func CreatePerson(w http.ResponseWriter, r *http.Request) {
+  params := mux.Vars(r)
+  var person Person
+  _ = json.NewDecoder(r.Body).Decode(&person)
+  person.ID = params["id"]
+  people = append(people, person)
+  json.NewEncoder(w).Encode(people)
+}
+
+func DeletePerson(w http.ResponseWriter, r *http.Request) {
+  params := mux.Vars(r)
+  for index, item := range people {
+  	if item.ID == params["id"] {
+    	people = append(people[:index], people[index+1:]...)
+      break
+  	}
+  	json.NewEncoder(w).Encode(people)
 	}
-	return &Page{Title: title, Body: body}, nil
-}
 
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/view/"):]
-	p, _ := loadPage(title)
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
 }
-
-// func main() {
-// 	http.HandleFunc("/view/", viewHandler)
-// 	http.ListenAndServe(":8080", nil)
-// }
