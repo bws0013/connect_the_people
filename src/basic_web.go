@@ -63,14 +63,32 @@ func GetPeople(w http.ResponseWriter, r *http.Request) {
       people_string = append(people_string, v.Json.String())
     }
 
+    // var ff []interface{}
+    //
+    // var f interface{}
+    // f = json.Unmarshal([]byte(people_string[0]), &f)
+    //
+    // ff = append(ff, f)
+
+    // err = json.Unmarshal([]byte(people_string[1]), &f)
+    // check_err(err)
+
     jsonParsedObj, err := gabs.ParseJSON([]byte(people_string[0]))
     check_err(err)
-    fmt.Println(jsonParsedObj)
 
     json_string := jsonParsedObj.String()
-    // json_string = strings.Replace(json_string,"\\","",-1)
+    // bytes, err := json.Marshal(jsonParsedObj)
+    // check_err(err)
+    // fmt.Println(string(bytes))
+    // check_err(err)
+    //
+    // json_string = string(bytes)
 
-    json.NewEncoder(w).Encode(json_string)
+    // fmt.Println(string(bytes))
+    fmt.Println("I have been chosen")
+    // json.NewEncoder(w).Encode(ff)
+    w.Header().Set("Content-Type", "application/json")
+    w.Write([]byte(json_string))
 }
 
 func GetPerson(w http.ResponseWriter, r *http.Request) {
