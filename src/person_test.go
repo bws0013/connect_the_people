@@ -6,7 +6,7 @@ import (
 )
 
 // Most of the simple tests are just going to need a person or two, this generates those people
-func setup_simple_test() map[string]Person {
+func get_example_person_map() map[string]Person {
   sample_ben := []byte(`{"person":{"name":"ben","tags":["friend","geog 1000","dog person","cat person"]}}`)
   sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
 	sample_dave := []byte(`{"person":{"name":"dave","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18"}},{"tres":"nil"},{"quad":"nil"}]}}}}`)
@@ -31,7 +31,7 @@ func setup_simple_test() map[string]Person {
 
 // Just test that getting the name returns the correct info
 func Test_basic_name(t *testing.T) {
-  pm := setup_simple_test()
+  pm := get_example_person_map()
 
   p := pm["ben"]
 
@@ -45,7 +45,7 @@ func Test_basic_name(t *testing.T) {
 	In this test both users have the tag.
 */
 func Test_remove_tag_present(t *testing.T) {
-  pm := setup_simple_test()
+  pm := get_example_person_map()
 
   tag_to_delete := "cat person"
 
@@ -72,7 +72,7 @@ func Test_remove_tag_present(t *testing.T) {
 	between removing items that the person has and those that they do not.
 */
 func Test_remove_tag_not_present(t *testing.T) {
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 
   tag_to_delete := "cat person1"
 
@@ -94,7 +94,7 @@ func Test_remove_tag_not_present(t *testing.T) {
 
 // Testing the adding of traits to a person
 func Test_add_some_traits_simple(t *testing.T) {
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 
 	traits_path := "person.traits"
 
@@ -122,7 +122,7 @@ func Test_add_some_traits_simple(t *testing.T) {
 // Seeing if we can delete a single trait of a person
 func Test_delete_single_trait(t *testing.T) {
 
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 	p_steve := pm["steve"]
 
 	current_json := p_steve.Json
@@ -139,7 +139,7 @@ func Test_delete_single_trait(t *testing.T) {
 // Test of my function for getting a persons traits
 func Test_get_person_traits(t *testing.T) {
 
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 	simple_person := pm["steve"]
 
 	trait_map := simple_person.get_person_traits()
@@ -155,7 +155,7 @@ func Test_get_person_traits(t *testing.T) {
 // They could be whole other objects
 func Test_delete_array_trait(t *testing.T) {
 
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 	p_steve := pm["steve"]
 	current_json := p_steve.Json
 
@@ -173,7 +173,7 @@ func Test_delete_array_trait(t *testing.T) {
 // This test isnt one of my program, but rather the functionality of a library
 func Test_deep_search(t *testing.T) {
 
-	pm := setup_simple_test()
+	pm := get_example_person_map()
 	p_dave := pm["dave"]
 
 	r1 := p_dave.Json.ExistsP("person.traits.relative.brother")

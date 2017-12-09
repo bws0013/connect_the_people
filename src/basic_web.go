@@ -1,51 +1,82 @@
 package main
 
 import (
-    "encoding/json"
+    "fmt"
     "log"
+    // "strings"
     "net/http"
+    "encoding/json"
     "github.com/gorilla/mux"
+    "github.com/Jeffail/gabs"
 )
 
-type Person struct {
-    ID        string   `json:"id,omitempty"`
-    Firstname string   `json:"firstname,omitempty"`
-    Lastname  string   `json:"lastname,omitempty"`
-    Address   *Address `json:"address,omitempty"`
-}
-type Address struct {
-    City  string `json:"city,omitempty"`
-    State string `json:"state,omitempty"`
-}
-
-var (
-	people []Person
-)
+var people []Person
 
 // Copying from here: https://www.codementor.io/codehakase/building-a-restful-api-with-golang-a6yivzqdo
 
 // our main function
 func main() {
 
+  pm := get_example_person_map()
+  for _, p := range pm {
+    people = append(people, p)
+  }
+
 	router := mux.NewRouter()
-	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
-	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
 
   router.HandleFunc("/people", GetPeople).Methods("GET")
   router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
   router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
-  router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")
+  router.HandleFunc("/people/{ild}", DeletePerson).Methods("DELETE")
   log.Fatal(http.ListenAndServe(":8000", router))
 }
 
+func get_example_person_map() map[string]Person {
+  sample_ben := []byte(`{"person":{"name":"ben","tags":["friend","geog 1000","dog person","cat person"]}}`)
+  sample_steve := []byte(`{"person":{"name":"steve","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":["uno","tres","quad"]}}}}`)
+	sample_dave := []byte(`{"person":{"name":"dave","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18"}},{"tres":"nil"},{"quad":"nil"}]}}}}`)
+	sample_stan := []byte(`{"person":{"name":"stan","tags":["cat person"],"traits":{"location":{"current":"md"},"relative":{"brother":[{"uno":{"age":"18","pet":[{"cat":"cat-do"},{"dog":"dog-do"},{"rat": "rat-do"}]}},{"tres":"dc"},{"quad":"yo"}]}}}}`)
+	sample_edwin := []byte(`{"person":{"name":"edwin","traits":{"relative":{"brother":[{"uno":{"pet":[{"cat":"cat-do","kittens":[{"male":"one"},{"female":"two"},"third"]},{"dog":"dog-do"},{"rat":"rat-do"}]}}]}}}}`)
+
+  p_ben := new_person_from_data(sample_ben)
+  p_steve := new_person_from_data(sample_steve)
+	p_dave := new_person_from_data(sample_dave)
+	p_stan := new_person_from_data(sample_stan)
+	p_edwin := new_person_from_data(sample_edwin)
+
+  test_people_map := make(map[string]Person)
+  test_people_map[p_ben.get_name()] = *p_ben
+  test_people_map[p_steve.get_name()] = *p_steve
+	test_people_map[p_dave.get_name()] = *p_dave
+	test_people_map[p_stan.get_name()] = *p_stan
+	test_people_map[p_edwin.get_name()] = *p_edwin
+
+	return test_people_map
+}
+
+// ***** RESTful stuff below *****
+
+
 func GetPeople(w http.ResponseWriter, r *http.Request) {
-    json.NewEncoder(w).Encode(people)
+    people_string := make([]string,0)
+    for _, v := range people {
+      people_string = append(people_string, v.Json.String())
+    }
+
+    jsonParsedObj, err := gabs.ParseJSON([]byte(people_string[0]))
+    check_err(err)
+    fmt.Println(jsonParsedObj)
+
+    json_string := jsonParsedObj.String()
+    // json_string = strings.Replace(json_string,"\\","",-1)
+
+    json.NewEncoder(w).Encode(json_string)
 }
 
 func GetPerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   for _, item := range people {
-    if item.ID == params["id"] {
+    if item.get_name() == params["id"] {
       json.NewEncoder(w).Encode(item)
       return
     }
@@ -55,17 +86,15 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 
 func CreatePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
-  var person Person
-  _ = json.NewDecoder(r.Body).Decode(&person)
-  person.ID = params["id"]
-  people = append(people, person)
+  person := new_person(params["id"])
+  people = append(people, *person)
   json.NewEncoder(w).Encode(people)
 }
 
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   for index, item := range people {
-  	if item.ID == params["id"] {
+  	if item.get_name() == params["id"] {
     	people = append(people[:index], people[index+1:]...)
       break
   	}
