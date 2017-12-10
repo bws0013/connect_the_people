@@ -13,6 +13,7 @@ import (
 // Name OR Maybe some kind of id and just have name be its own thang
 // Traits
 // Tags/Groups
+
 type Person struct {
   Name string // We may want this to be some kind of id
   Json *gabs.Container
@@ -21,6 +22,7 @@ type Person struct {
 // The global people_map is just used for testing purposes at the moment
 var (
   people_map = make(map[string]Person)
+  all_people = gabs.New()
 )
 
 // Create a new person given a name, the name will probably be some kind of id later
@@ -33,6 +35,7 @@ func new_person(name_in string) *Person {
   // new_json.ArrayAppend("", "person", "tags")
   new_json.Array("person", "tags")
   p.Json = new_json
+  all_people.ArrayAppend(new_json, "People")
   return p
 }
 
@@ -46,6 +49,7 @@ func new_person_from_data(person_data []byte) *Person {
 
   p.Name = new_json.Path("person.name").String()
   p.Json = new_json
+
 
   return p
 }

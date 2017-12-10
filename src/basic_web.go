@@ -17,10 +17,14 @@ var people []Person
 // our main function
 func main() {
 
+  all_people.Array("People")
+
   pm := get_example_person_map()
   for _, p := range pm {
     people = append(people, p)
   }
+
+  group_all_people()
 
 	router := mux.NewRouter()
 
@@ -54,6 +58,11 @@ func get_example_person_map() map[string]Person {
 	return test_people_map
 }
 
+func group_all_people() {
+
+  fmt.Println(all_people.String())
+}
+
 // ***** RESTful stuff below *****
 
 
@@ -63,26 +72,20 @@ func GetPeople(w http.ResponseWriter, r *http.Request) {
       people_string = append(people_string, v.Json.String())
     }
 
-    // var ff []interface{}
-    //
-    // var f interface{}
-    // f = json.Unmarshal([]byte(people_string[0]), &f)
-    //
-    // ff = append(ff, f)
-
-    // err = json.Unmarshal([]byte(people_string[1]), &f)
-    // check_err(err)
 
     jsonParsedObj, err := gabs.ParseJSON([]byte(people_string[0]))
     check_err(err)
 
+    for i := 1; i < len(people_string); i++ {
+      current_parsed_obj, err := gabs.ParseJSON([]byte(people_string[i]))
+      check_err(err)
+      err = jsonParsedObj.Merge(current_parsed_obj)
+      check_err(err)
+    }
+
     json_string := jsonParsedObj.String()
-    // bytes, err := json.Marshal(jsonParsedObj)
-    // check_err(err)
-    // fmt.Println(string(bytes))
-    // check_err(err)
-    //
-    // json_string = string(bytes)
+    fmt.Println(json_string)
+
 
     // fmt.Println(string(bytes))
     fmt.Println("I have been chosen")
