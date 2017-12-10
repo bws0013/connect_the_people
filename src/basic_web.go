@@ -26,6 +26,7 @@ func main() {
 	router := mux.NewRouter()
 
   router.HandleFunc("/people", GetPeople).Methods("GET")
+  router.HandleFunc("/people/", GetPeople).Methods("GET")
   router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
   router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
   router.HandleFunc("/people/{ild}", DeletePerson).Methods("DELETE")
@@ -105,13 +106,15 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   person := new_person(params["id"])
   people = append(people, *person)
+  fmt.Println(*person)
   json.NewEncoder(w).Encode(people)
 }
 
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   for index, item := range people {
-  	if item.get_name() == params["id"] {
+    fmt.Println(params["ild"])
+  	if item.get_name() == params["ild"] {
     	people = append(people[:index], people[index+1:]...)
       break
   	}
