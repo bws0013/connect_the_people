@@ -17,18 +17,16 @@ var people []Person
 // our main function
 func main() {
 
-  all_people.Array("People")
 
   pm := get_example_person_map()
   for _, p := range pm {
     people = append(people, p)
   }
 
-  group_all_people()
-
 	router := mux.NewRouter()
 
   router.HandleFunc("/people", GetPeople).Methods("GET")
+  router.HandleFunc("/people/", GetPeople).Methods("GET")
   router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
   router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
   router.HandleFunc("/people/{ild}", DeletePerson).Methods("DELETE")
@@ -58,33 +56,29 @@ func get_example_person_map() map[string]Person {
 	return test_people_map
 }
 
-func group_all_people() {
-
-  fmt.Println(all_people.String())
-}
 
 // ***** RESTful stuff below *****
 
 
 func GetPeople(w http.ResponseWriter, r *http.Request) {
-    people_string := make([]string,0)
+    jsonObj := gabs.New()
+    jsonObj.Array("Names")
     for _, v := range people {
-      people_string = append(people_string, v.Json.String())
+      jsonObj.ArrayAppend(v.get_name(), "Names")
     }
 
-
-    jsonParsedObj, err := gabs.ParseJSON([]byte(people_string[0]))
-    check_err(err)
-
-    for i := 1; i < len(people_string); i++ {
-      current_parsed_obj, err := gabs.ParseJSON([]byte(people_string[i]))
-      check_err(err)
-      err = jsonParsedObj.Merge(current_parsed_obj)
-      check_err(err)
-    }
-
-    json_string := jsonParsedObj.String()
-    fmt.Println(json_string)
+    // jsonParsedObj, err := gabs.ParseJSON([]byte(people_string[0]))
+    // check_err(err)
+    //
+    // for i := 1; i < len(people_string); i++ {
+    //   current_parsed_obj, err := gabs.ParseJSON([]byte(people_string[i]))
+    //   check_err(err)
+    //   err = jsonParsedObj.Merge(current_parsed_obj)
+    //   check_err(err)
+    // }
+    //
+    json_string := jsonObj.String()
+    // fmt.Println(json_string)
 
 
     // fmt.Println(string(bytes))
@@ -98,7 +92,10 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   for _, item := range people {
     if item.get_name() == params["id"] {
-      json.NewEncoder(w).Encode(item)
+      // jsonParsedObj, err := gabs.ParseJSON())
+      // check_err(err)
+      w.Header().Set("Content-Type", "application/json")
+      w.Write([]byte(item.Json.String()))
       return
     }
   }
@@ -109,13 +106,15 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   person := new_person(params["id"])
   people = append(people, *person)
+  fmt.Println(*person)
   json.NewEncoder(w).Encode(people)
 }
 
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   for index, item := range people {
-  	if item.get_name() == params["id"] {
+    fmt.Println(params["ild"])
+  	if item.get_name() == params["ild"] {
     	people = append(people[:index], people[index+1:]...)
       break
   	}

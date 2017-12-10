@@ -22,7 +22,6 @@ type Person struct {
 // The global people_map is just used for testing purposes at the moment
 var (
   people_map = make(map[string]Person)
-  all_people = gabs.New()
 )
 
 // Create a new person given a name, the name will probably be some kind of id later
@@ -35,7 +34,6 @@ func new_person(name_in string) *Person {
   // new_json.ArrayAppend("", "person", "tags")
   new_json.Array("person", "tags")
   p.Json = new_json
-  all_people.ArrayAppend(new_json, "People")
   return p
 }
 
